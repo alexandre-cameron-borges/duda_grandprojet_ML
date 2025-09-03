@@ -37,7 +37,7 @@ def user_input_features():
     number_of_device_registered = st.sidebar.selectbox("Nombre d'appareils enregistrés", [1, 2, 3, 4, 5, 6], key="num_devices")
     number_of_address = st.sidebar.selectbox("Nombre d'adresses", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], key="num_address")
 
-    # Création du DataFrame avec les noms de colonnes corrects
+    # Création du DataFrame avec les noms de colonnes corrects (correspondant aux typos du modèle)
     data = {
         'Tenure': tenure,
         'PreferredLoginDevice': preferred_login_device,
@@ -47,17 +47,17 @@ def user_input_features():
         'Gender': gender,
         'HourSpendOnApp': hour_spend_on_app,
         'NumberOfDeviceRegistered': number_of_device_registered,
-        'PreferredOrderCat': preferred_order_cat,
+        'PreferedOrderCat': preferred_order_cat, # CORRIGÉ: Un seul 'r'
         'SatisfactionScore': satisfaction_score,
         'MaritalStatus': marital_status,
         'NumberOfAddress': number_of_address,
         'Complain': complain,
-        'OrderAmountHikeFromLastYear': order_amount_hike_from_last_year,
+        'OrderAmountHikeFromlastYear': order_amount_hike_from_last_year, # CORRIGÉ: 'l' minuscule
         'CouponUsed': coupon_used,
         'OrderCount': order_count,
         'DaySinceLastOrder': day_since_last_order,
         'CashbackAmount': cashback_amount,
-        # On peut laisser une valeur par défaut pour Cluster_RFM car ce n'est pas une entrée utilisateur directe
+        # On peut laisser une valeur par défaut pour Cluster_RFM car ce n''est pas une entrée utilisateur directe
         'Cluster_RFM': 0 
     }
     
@@ -102,4 +102,3 @@ if st.button("Lancer la Prédiction", key="predict_button"):
 
     except Exception as e:
         st.error(f"Une erreur est survenue lors de la prédiction : {e}")
-
