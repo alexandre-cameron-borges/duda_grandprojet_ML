@@ -1,92 +1,105 @@
 import streamlit as st
 import pandas as pd
-from predict import make_prediction, model # On importe la fonction et la variable 'model'
+from predict import make_prediction
 
 # --- Configuration de la page ---
 st.set_page_config(
     page_title="Prédiction de Churn Client",
-    page_icon="🔮",
+    page_icon="👋",
     layout="wide"
 )
 
-# --- Interface Utilisateur ---
+# --- Barre latérale pour la saisie des données ---
+st.sidebar.header("Paramètres du Client")
+
+def user_input_features():
+    """
+    Crée les widgets Streamlit pour la saisie des données utilisateur.
+    """
+    tenure = st.sidebar.slider("Ancienneté (mois)", 0, 70, 10, key="tenure")
+    satisfaction_score = st.sidebar.slider("Score de Satisfaction", 1, 5, 3, key="satisfaction_score")
+    hour_spend_on_app = st.sidebar.slider("Heures passées sur l'app/site", 0.0, 10.0, 3.0, 0.1, key="hour_spend_on_app")
+    day_since_last_order = st.sidebar.slider("Jours depuis la dernière commande", 0, 50, 5, key="day_since_last_order")
+    cashback_amount = st.sidebar.slider("Montant du Cashback", 0.0, 500.0, 150.0, 1.0, key="cashback_amount")
+    order_amount_hike_from_last_year = st.sidebar.slider("Augmentation des commandes (%)", 0.0, 50.0, 15.0, 0.5, key="order_amount_hike")
+    coupon_used = st.sidebar.slider("Coupons utilisés", 0, 20, 1, key="coupon_used")
+    order_count = st.sidebar.slider("Nombre de commandes", 0, 20, 2, key="order_count")
+    warehouse_to_home = st.sidebar.slider("Distance entrepôt-maison", 5, 50, 15, key="warehouse_to_home")
+    
+    complain = st.sidebar.selectbox("Réclamation (dernier mois)", [0, 1], key="complain")
+    gender = st.sidebar.selectbox("Genre", ["Male", "Female"], key="gender")
+    marital_status = st.sidebar.selectbox("Statut Marital", ["Single", "Married", "Divorced"], key="marital_status")
+    preferred_payment_mode = st.sidebar.selectbox("Mode de Paiement Préféré", ['Debit Card', 'Credit Card', 'E wallet', 'Cash on Delivery', 'UPI'], key="payment_mode")
+    preferred_order_cat = st.sidebar.selectbox("Catégorie Préférée", ['Laptop & Accessory', 'Mobile Phone', 'Fashion', 'Grocery', 'Others'], key="order_cat")
+    preferred_login_device = st.sidebar.selectbox("Appareil de Connexion", ['Mobile Phone', 'Computer'], key="login_device")
+    
+    city_tier = st.sidebar.selectbox("Catégorie de Ville", [1, 2, 3], key="city_tier")
+    number_of_device_registered = st.sidebar.selectbox("Nombre d'appareils enregistrés", [1, 2, 3, 4, 5, 6], key="num_devices")
+    number_of_address = st.sidebar.selectbox("Nombre d'adresses", [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], key="num_address")
+
+    # Création du DataFrame avec les noms de colonnes corrects
+    data = {
+        'Tenure': tenure,
+        'PreferredLoginDevice': preferred_login_device,
+        'CityTier': city_tier,
+        'WarehouseToHome': warehouse_to_home,
+        'PreferredPaymentMode': preferred_payment_mode,
+        'Gender': gender,
+        'HourSpendOnApp': hour_spend_on_app,
+        'NumberOfDeviceRegistered': number_of_device_registered,
+        'PreferredOrderCat': preferred_order_cat,
+        'SatisfactionScore': satisfaction_score,
+        'MaritalStatus': marital_status,
+        'NumberOfAddress': number_of_address,
+        'Complain': complain,
+        'OrderAmountHikeFromLastYear': order_amount_hike_from_last_year,
+        'CouponUsed': coupon_used,
+        'OrderCount': order_count,
+        'DaySinceLastOrder': day_since_last_order,
+        'CashbackAmount': cashback_amount,
+        # On peut laisser une valeur par défaut pour Cluster_RFM car ce n'est pas une entrée utilisateur directe
+        'Cluster_RFM': 0 
+    }
+    
+    features = pd.DataFrame(data, index=[0])
+    return features
+
+# --- Interface principale ---
 st.title("Prédiction du Churn Client 🔮")
-st.markdown("""
-    Cette application utilise un modèle de Machine Learning (Random Forest) pour prédire si un client
-    est susceptible de résilier son abonnement. Entrez les caractéristiques les plus importantes du client
-    ci-dessous pour obtenir une prédiction.
+st.write("""
+Cette application prédit la probabilité qu'un client résilie son abonnement (churn).
+Utilisez les options dans la barre latérale pour ajuster les caractéristiques du client et voir l'impact sur le risque de churn.
 """)
 
-st.divider()
+# Récupérer les données de l'utilisateur
+input_df = user_input_features()
 
-# On vérifie si le modèle a bien été chargé depuis predict.py
-if model is not None:
-    # Création de colonnes pour une mise en page claire du formulaire
-    col1, col2, col3 = st.columns(3)
+# Afficher les données d'entrée
+st.subheader("Caractéristiques du client sélectionnées")
+st.write(input_df)
 
-    with col1:
-        st.subheader("Comportement & Ancienneté")
-        tenure = st.slider("Ancienneté du client (en mois)", 0, 70, 10, key="tenure")
-        hour_spend_on_app = st.slider("Heures moyennes passées sur l'app", 0.0, 10.0, 2.5, 0.1, key="hours")
-        day_since_last_order = st.slider("Jours depuis la dernière commande", 0, 50, 5, key="last_order")
-    
-    with col2:
-        st.subheader("Satisfaction & Service")
-        satisfaction_score = st.select_slider(
-            "Score de satisfaction",
-            options=[1, 2, 3, 4, 5],
-            value=3, key="satisfaction"
-        )
-        complain = st.selectbox("A déposé une réclamation (dernier mois) ?", (0, 1), format_func=lambda x: "Oui" if x == 1 else "Non", key="complain")
-        order_count = st.number_input("Nombre de commandes (dernier mois)", min_value=0, value=2, step=1, key="order_count")
-
-    with col3:
-        st.subheader("Informations personnelles")
-        marital_status = st.selectbox("Statut marital", options=["Single", "Married", "Divorced"], key="marital")
-        gender = st.selectbox("Genre", options=["Male", "Female"], key="gender")
-        number_of_address = st.number_input("Nombre d'adresses enregistrées", min_value=1, value=2, step=1, key="address")
-
-
-    # Bouton pour lancer la prédiction
-    if st.button("Lancer la Prédiction", type="primary", use_container_width=True):
+# Bouton pour lancer la prédiction
+if st.button("Lancer la Prédiction", key="predict_button"):
+    try:
+        prediction_proba, prediction = make_prediction(input_df)
         
-        # Création du DataFrame avec les entrées utilisateur
-        # Les autres colonnes moins importantes sont fixées à des valeurs moyennes pour simplifier l'interface
-        input_data = pd.DataFrame({
-            'Tenure': [tenure],
-            'PreferredLoginDevice': ['Mobile Phone'],
-            'CityTier': [1],
-            'WarehouseToHome': [20.0],
-            'PreferredPaymentMode': ['Credit Card'],
-            'Gender': [gender],
-            'HourSpendOnApp': [hour_spend_on_app],
-            'NumberOfDeviceRegistered': [3],
-            'PreferredOrderCat': ['Laptop & Accessory'],
-            'SatisfactionScore': [satisfaction_score],
-            'MaritalStatus': [marital_status],
-            'NumberOfAddress': [number_of_address],
-            'Complain': [complain],
-            'OrderAmountHikeFromLastYear': [15.0],
-            'CouponUsed': [1.0],
-            'OrderCount': [order_count],
-            'DaySinceLastOrder': [day_since_last_order],
-            'CashbackAmount': [150.0],
-            'Cluster_RFM': [0]
-        })
-        
-        st.write("---")
-        
-        # Appel de la fonction de prédiction
-        churn_probability = make_prediction(input_data)
-
-        # Affichage du résultat
         st.subheader("Résultat de la Prédiction")
         
-        if churn_probability > 0.5:
-            st.error(f"🔴 Risque de Churn Élevé (Probabilité : {churn_probability:.2%})")
-            st.warning("Actions recommandées : Contacter le client, proposer une offre promotionnelle, ou analyser les réclamations récentes pour comprendre son insatisfaction.")
-        else:
-            st.success(f"✅ Risque de Churn Faible (Probabilité de churn : {churn_probability:.2%})")
-            st.info("Actions recommandées : Maintenir une bonne relation client, proposer des produits complémentaires via des newsletters ciblées.")
-else:
-    st.error("❌ Le modèle n'a pas pu être chargé. L'application ne peut pas fonctionner. Veuillez vérifier le fichier predict.py et la connexion à Hugging Face Hub.")
+        # Affichage avec des colonnes pour une meilleure mise en page
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if prediction == 1:
+                st.error("Risque de Churn : Élevé")
+            else:
+                st.success("Risque de Churn : Faible")
+        
+        with col2:
+            st.metric(label="Probabilité de Churn", value=f"{prediction_proba:.2%}")
+            
+        if prediction == 1:
+            st.warning("Actions recommandées : Envisager une offre promotionnelle, un contact proactif du service client ou une enquête de satisfaction pour comprendre les points de friction.")
+
+    except Exception as e:
+        st.error(f"Une erreur est survenue lors de la prédiction : {e}")
+
