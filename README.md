@@ -7,7 +7,7 @@ L'objectif principal était de répondre à la question suivante :
 Quelles caractéristiques et quels comportements clients contribuent le plus à l'attrition, et comment pouvons-nous utiliser ces informations pour la réduire ?
 
 ## 📊 Dataset
-Le jeu de données utilisé provient de Kaggle : E-Commerce Customer Churn Analysis and Prediction.
+Le jeu de données utilisé provient de Kaggle : E-Commerce Customer Churn Analysis and Prediction[https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction].
 
 Il contient des informations variées sur les clients, telles que :
 
