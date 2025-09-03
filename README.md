@@ -22,13 +22,17 @@ Satisfaction et Service Client : Score de satisfaction, réclamations.
 # 🛠️ Méthodologie
 Le projet a été structuré en plusieurs étapes clés :
 
-## Analyse Exploratoire des Données (EDA) : Visualisation des distributions, identification des corrélations et des valeurs manquantes.
+## Analyse Exploratoire des Données (EDA) : 
+Visualisation des distributions, identification des corrélations et des valeurs manquantes.
 
-## Nettoyage et Prétraitement : Standardisation des catégories et gestion des valeurs manquantes.
+## Nettoyage et Prétraitement : 
+Standardisation des catégories et gestion des valeurs manquantes.
 
-## Feature Engineering : Création de segments clients pertinents en utilisant une approche de clustering RFM (Récence, Fréquence, Monétaire).
+## Feature Engineering : 
+Création de segments clients pertinents en utilisant une approche de clustering RFM (Récence, Fréquence, Monétaire).
 
-## Modélisation : Entraînement et comparaison de trois modèles de classification :
+## Modélisation : 
+Entraînement et comparaison de trois modèles de classification :
 
 Régression Logistique
 
@@ -36,9 +40,11 @@ Arbre de Décision
 
 Random Forest (meilleur modèle retenu)
 
-## Évaluation : Le Random Forest a été sélectionné pour ses excellentes performances, notamment sur la métrique PR-AUC (Precision-Recall Area Under Curve), qui est très pertinente pour les datasets déséquilibrés.
+## Évaluation : 
+Le Random Forest a été sélectionné pour ses excellentes performances, notamment sur la métrique PR-AUC (Precision-Recall Area Under Curve), qui est très pertinente pour les datasets déséquilibrés.
 
-## Interprétabilité : Utilisation de SHAP (SHapley Additive exPlanations) pour comprendre l'influence de chaque caractéristique sur les prédictions du modèle. Les facteurs les plus importants se sont avérés être l'ancienneté (Tenure), le score de satisfaction, et le fait d'avoir déposé une réclamation.
+## Interprétabilité : 
+Utilisation de SHAP (SHapley Additive exPlanations) pour comprendre l'influence de chaque caractéristique sur les prédictions du modèle. Les facteurs les plus importants se sont avérés être l'ancienneté (Tenure), le score de satisfaction, et le fait d'avoir déposé une réclamation.
 
 # 🚀 Application Web Streamlit
 Une application web a été développée avec Streamlit pour permettre une interaction simple et intuitive avec le modèle de prédiction.
