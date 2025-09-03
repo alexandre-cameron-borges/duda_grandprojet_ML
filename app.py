@@ -81,7 +81,11 @@ st.write(input_df)
 # Bouton pour lancer la prédiction
 if st.button("Lancer la Prédiction", key="predict_button"):
     try:
-        prediction_proba, prediction = make_prediction(input_df)
+        # CORRECTION : On récupère une seule valeur (la probabilité)
+        prediction_proba = make_prediction(input_df)
+        
+        # On déduit la classe de prédiction (0 ou 1) à partir de la probabilité
+        prediction = 1 if prediction_proba > 0.5 else 0
         
         st.subheader("Résultat de la Prédiction")
         
@@ -102,3 +106,4 @@ if st.button("Lancer la Prédiction", key="predict_button"):
 
     except Exception as e:
         st.error(f"Une erreur est survenue lors de la prédiction : {e}")
+
