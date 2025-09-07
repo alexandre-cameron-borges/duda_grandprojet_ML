@@ -1,4 +1,4 @@
-# Prédiction du Churn Client - Projet de Machine Learning
+# Prédiction du Churn Client - Projet de Machine Learning - SDUDA25
 Plateforme e-commerce — prédire la probabilité de résiliation (churn), comprendre **pourquoi** et **agir** via une app web interactive et des playbooks business.
 
 **Présentation (slides)** : https://docs.google.com/presentation/d/1RMP6nOubCtmiaKo5-O1d-b62YopHXdX40PQx8i74r8E/edit?usp=sharing  
