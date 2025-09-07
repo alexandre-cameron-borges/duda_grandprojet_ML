@@ -49,7 +49,7 @@ Utilisation de SHAP (SHapley Additive exPlanations) pour comprendre l'influence 
 # 🚀 Application Web Streamlit
 Une application web a été développée avec Streamlit pour permettre une interaction simple et intuitive avec le modèle de prédiction.
 
-Lien vers l'application : Application de Prédiction de Churn
+Lien vers l'application : Application de Prédiction de Churn [https://acb-churn-dudagrandprojetml.streamlit.app/]
 
 L'application permet de :
 
