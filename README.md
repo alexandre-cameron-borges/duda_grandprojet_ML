@@ -1,6 +1,8 @@
 # Prédiction du Churn Client - Projet de Machine Learning
 Ce projet analyse les données de clients d'une plateforme e-commerce pour prédire la probabilité de résiliation (churn). L'objectif est de comprendre les facteurs clés qui mènent à la perte de clients et de construire un modèle prédictif déployé via une application web interactive.
 
+Présentation: [https://docs.google.com/presentation/d/1RMP6nOubCtmiaKo5-O1d-b62YopHXdX40PQx8i74r8E/edit?usp=sharing]
+
 ## 🎯 Objectif du Projet
 L'objectif principal était de répondre à la question suivante :
 
