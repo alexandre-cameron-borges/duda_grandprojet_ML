@@ -3,6 +3,7 @@ Plateforme e-commerce — prédire la probabilité de résiliation (churn), comp
 
 **Présentation (slides)** : https://docs.google.com/presentation/d/1RMP6nOubCtmiaKo5-O1d-b62YopHXdX40PQx8i74r8E/edit?usp=sharing  
 **App web (Streamlit)** : https://acb-churn-dudagrandprojetml.streamlit.app/
+**Code Google Colab** : https://colab.research.google.com/drive/1nhwqL_EXHR2y_li6RrHbbJ-c9S6keSon?usp=sharing
 
 ---
 
