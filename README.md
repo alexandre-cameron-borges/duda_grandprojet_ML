@@ -1,76 +1,93 @@
 # Prédiction du Churn Client - Projet de Machine Learning
-Ce projet analyse les données de clients d'une plateforme e-commerce pour prédire la probabilité de résiliation (churn). L'objectif est de comprendre les facteurs clés qui mènent à la perte de clients et de construire un modèle prédictif déployé via une application web interactive.
+Plateforme e-commerce — prédire la probabilité de résiliation (churn), comprendre **pourquoi** et **agir** via une app web interactive et des playbooks business.
 
-Présentation: [https://docs.google.com/presentation/d/1RMP6nOubCtmiaKo5-O1d-b62YopHXdX40PQx8i74r8E/edit?usp=sharing]
+**Présentation (slides)** : https://docs.google.com/presentation/d/1RMP6nOubCtmiaKo5-O1d-b62YopHXdX40PQx8i74r8E/edit?usp=sharing  
+**App web (Streamlit)** : https://acb-churn-dudagrandprojetml.streamlit.app/
+
+---
 
 ## 🎯 Objectif du Projet
-L'objectif principal était de répondre à la question suivante :
+> Quelles caractéristiques et quels comportements clients contribuent le plus à l’attrition, et comment utiliser ces informations pour la **réduire** ?
 
-Quelles caractéristiques et quels comportements clients contribuent le plus à l'attrition, et comment pouvons-nous utiliser ces informations pour la réduire ?
+---
 
 ## 📊 Dataset
-Le jeu de données utilisé provient de Kaggle : E-Commerce Customer Churn Analysis and Prediction(https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction).
+Kaggle — *E-Commerce Customer Churn Analysis and Prediction*  
+Source : https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction
 
-Il contient des informations variées sur les clients, telles que :
+**Champs clés**
+- **Démographie** : Sexe, Statut marital, Ville (CityTier)
+- **Comportement** : **Tenure**, appareil préféré, heures passées sur l’app
+- **Achats** : **PreferedOrderCat**, **OrderCount**, **DaySinceLastOrder (Récence)**
+- **Satisfaction & Care** : **SatisfactionScore**, **Complain**
+- **Logistique & Paiement** : **WarehouseToHome**, **PreferredPaymentMode**, **NumberOfAddress**
+- **Monétaire** : **CashbackAmount**
+- **RFM proxy** : R = DaySinceLastOrder, F = OrderCount, M = CashbackAmount/OrderCount → **Cluster_RFM**
 
-Données démographiques : Sexe, statut marital, ville.
+---
 
-Comportement sur la plateforme : Ancienneté (Tenure), appareil de connexion préféré, heures passées sur l'application.
+## 🛠️ Méthodologie
+1. **EDA** : distributions, corrélations, valeurs manquantes, fuites évitées  
+2. **Prétraitement** : `StandardScaler` (num), `OneHotEncoder` (cat) via `ColumnTransformer`  
+3. **Modélisation** : `LogisticRegression`, `DecisionTree`, **`RandomForest` (retenu)**  
+4. **Validation** : `StratifiedKFold(n_splits=5, shuffle=True, random_state=42)`  
+5. **Interprétabilité** : **SHAP TreeExplainer** (classe 1 = churn)
 
-Historique d'achat : Catégorie de produits préférée, nombre de commandes, jours depuis la dernière commande.
+---
 
-Satisfaction et Service Client : Score de satisfaction, réclamations.
+## ✅ Résultats (CV 5-folds)
+| Modèle | PR-AUC | ROC-AUC | Balanced Acc | F1 (classe=1) |
+|---|---:|---:|---:|---:|
+| **RandomForest** | **0,946** | **0,986** | **0,913** | **0,870** |
+| DecisionTree | 0,733 | 0,905 | 0,897 | 0,802 |
+| LogisticRegression | 0,696 | 0,889 | 0,803 | 0,578 |
 
-# 🛠️ Méthodologie
-Le projet a été structuré en plusieurs étapes clés :
+**Top drivers SHAP (importance globale, % approx.)**
+| Rang | Driver | % |
+|---:|---|---:|
+| 1 | **Tenure** | **25,8** |
+| 2 | **Complain** | **12,0** |
+| 3 | **PreferedOrderCat** | **8,8** |
+| 4 | **MaritalStatus** | **8,2** |
+| 5 | **DaySinceLastOrder** | **6,1** |
+| 6 | **CashbackAmount** | **5,8** |
+| 7 | **NumberOfAddress** | **4,4** |
+| 8 | **PreferredPaymentMode** | **4,3** |
+| 9 | **WarehouseToHome** | **4,0** |
+| 10 | **SatisfactionScore** | **4,0** |
 
-## Analyse Exploratoire des Données (EDA) : 
-Visualisation des distributions, identification des corrélations et des valeurs manquantes.
+**Lecture** : le churn se joue tôt (**Tenure**), sur la **qualité de service** (**Complain**), la **récence**, la **catégorie d’achat**, la **logistique/paiement** et la **satisfaction**.
 
-## Nettoyage et Prétraitement : 
-Standardisation des catégories et gestion des valeurs manquantes.
+---
 
-## Feature Engineering : 
-Création de segments clients pertinents en utilisant une approche de clustering RFM (Récence, Fréquence, Monétaire).
+## 🧭 Playbooks Business (à tester)
+**1) Onboarding “100 jours d’or” (Tenure)**  
+- **Ce qu’on fait** : 3 touchpoints **J0/J7/J30** + page **“Mes avantages”** (points/cashback visibles)  
+- **Pourquoi** : ancrer la valeur tôt → ↓ churn 60j  
 
-## Modélisation : 
-Entraînement et comparaison de trois modèles de classification :
+**2) Care “24h ou geste” (Complain)**  
+- **Ce qu’on fait** : **TTR < 24h**, **owner unique**, message de résolution **personnalisé** ; **crédit auto** (5–8€) si >24h ; **squads** dédiées logistique/paiement  
+- **Pourquoi** : transformer un incident en **fidélité**  
 
-Régression Logistique
+**3) Triggers 14/30/60 + cashback dynamique (Récence/Monétaire)**  
+- **Ce qu’on fait** : 14j rappel valeur (sans promo) → 30j **petite offre** → 60j **offre forte** **uniquement** top-risque (score) ; **holdout 10–15%**  
+- **Pourquoi** : réactiver sans **cannibaliser** la marge  
 
-Arbre de Décision
 
-Random Forest (meilleur modèle retenu)
+---
 
-## Évaluation : 
-Le Random Forest a été sélectionné pour ses excellentes performances, notamment sur la métrique PR-AUC (Precision-Recall Area Under Curve), qui est très pertinente pour les datasets déséquilibrés.
+## 🚀 Application Web (Streamlit)
+- **Formulaire** : saisie des features client  
+- **Prédiction** : probabilité de churn + interprétabilité locale (SHAP)  
+- **Usage** : prioriser les actions (playbooks ci-dessus)
 
-## Interprétabilité : 
-Utilisation de SHAP (SHapley Additive exPlanations) pour comprendre l'influence de chaque caractéristique sur les prédictions du modèle. Les facteurs les plus importants se sont avérés être l'ancienneté (Tenure), le score de satisfaction, et le fait d'avoir déposé une réclamation.
+App : https://acb-churn-dudagrandprojetml.streamlit.app/
 
-# 🚀 Application Web Streamlit
-Une application web a été développée avec Streamlit pour permettre une interaction simple et intuitive avec le modèle de prédiction.
+---
 
-Lien vers l'application : Application de Prédiction de Churn [https://acb-churn-dudagrandprojetml.streamlit.app/]
-
-L'application permet de :
-
-Saisir les informations d'un client via un formulaire.
-
-Obtenir une prédiction en temps réel sur son risque de churn.
-
-Visualiser la probabilité de churn associée.
-
-# ⚙️ Comment lancer le projet localement
-Clonez le dépôt :
-
-git clone [https://github.com/alexandre-cameron-borges/duda_grandprojet_ML.git](https://github.com/alexandre-cameron-borges/duda_grandprojet_ML.git)
+## ⚙️ Lancer le projet en local
+```bash
+git clone https://github.com/alexandre-cameron-borges/duda_grandprojet_ML.git
 cd duda_grandprojet_ML
-
-Installez les dépendances :
-
 pip install -r requirements.txt
-
-Lancez l'application Streamlit :
-
 streamlit run app.py
